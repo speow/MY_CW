@@ -1,24 +1,124 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private TaskAdapter taskAdapter;
+    private DatabaseHelper databaseHelper;
+    private TextView emptyView;
+    private List<Task> taskList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        databaseHelper = new DatabaseHelper(this);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        emptyView = findViewById(R.id.emptyView);
+        FloatingActionButton fab = findViewById(R.id.fab);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        taskList = new ArrayList<>();
+
+        taskAdapter = new TaskAdapter(this, taskList, new TaskAdapter.OnTaskListener() {
+            @Override
+            public void onTaskDelete(Task task) {
+                deleteTask(task);
+            }
+
+            @Override
+            public void onTaskStatusChange(Task task) {
+                updateTaskStatus(task);
+            }
         });
+
+        recyclerView.setAdapter(taskAdapter);
+
+        loadTasks();
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadTasks();
+    }
+
+    private void loadTasks() {
+        taskList.clear();
+        taskList.addAll(databaseHelper.getAllTasks());
+        taskAdapter.notifyDataSetChanged();
+
+        if (taskList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
+    private void deleteTask(Task task) {
+        databaseHelper.deleteTask(task.getId());
+        loadTasks();
+        Toast.makeText(this, "Задача удалена", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateTaskStatus(Task task) {
+        task.setCompleted(!task.isCompleted());
+        databaseHelper.updateTask(task);
+        taskAdapter.notifyDataSetChanged();
+        Toast.makeText(this,
+                task.isCompleted() ? "Задача выполнена" : "Задача не выполнена",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_delete_all) {
+            databaseHelper.deleteAllTasks();
+            loadTasks();
+            Toast.makeText(this, "Все задачи удалены", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Ежедневник</string>
+    <string name="add_task">Добавить задачу</string>
+    <string name="task_title">Название задачи</string>
+    <string name="task_description">Описание задачи</string>
+    <string name="task_date">Дата</string>
+    <string name="task_time">Время</string>
+    <string name="save_task">Сохранить задачу</string>
+    <string name="delete_task">Удалить задачу</string>
+    <string name="no_tasks">Нет задач. Добавьте новую задачу!</string>
+    <string name="sample_task_title">Название задачи</string>
+    <string name="sample_task_description">Описание задачи</string>
+    <string name="sample_date">01.01.2024</string>
+    <string name="sample_time">12:00</string>
+    <string name="delete_all">Удалить все</string>
 </resources>
