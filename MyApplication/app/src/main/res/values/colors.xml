@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Основные цвета -->
+    <color name="primary">#6C63FF</color>
+    <color name="primary_dark">#5548C8</color>
+    <color name="primary_light">#8B85FF</color>
+    <color name="accent">#FF6584</color>
+    <color name="accent_light">#FF8FA3</color>
+
+    <!-- Фоновые цвета -->
+    <color name="background">#F5F7FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Текстовые цвета -->
+    <color name="text_primary">#2D3436</color>
+    <color name="text_secondary">#636E72</color>
+    <color name="text_hint">#B2BEC3</color>
+
+    <!-- Статусные цвета -->
+    <color name="success">#00B894</color>
+    <color name="warning">#FDCB6E</color>
+    <color name="error">#D63031</color>
+
+    <!-- Дополнительные -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="shadow">#1A000000</color>
+
+    <!-- Градиенты -->
+    <color name="gradient_start">#667EEA</color>
+    <color name="gradient_end">#764BA2</color>
 </resources>

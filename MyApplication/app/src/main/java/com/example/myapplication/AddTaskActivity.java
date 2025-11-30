@@ -31,7 +31,7 @@ public class AddTaskActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Добавить задачу");
+            getSupportActionBar().setTitle("");
         }
 
         databaseHelper = new DatabaseHelper(this);
@@ -130,10 +130,11 @@ public class AddTaskActivity extends AppCompatActivity {
         long result = databaseHelper.addTask(task);
 
         if (result != -1) {
-            Toast.makeText(this, "Задача добавлена", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "✓ Задача успешно добавлена!", Toast.LENGTH_SHORT).show();
             finish();
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         } else {
-            Toast.makeText(this, "Ошибка при добавлении задачи", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "✗ Ошибка при добавлении задачи", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -141,8 +142,15 @@ public class AddTaskActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
     }
 }

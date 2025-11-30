@@ -22,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TaskAdapter taskAdapter;
     private DatabaseHelper databaseHelper;
-    private TextView emptyView;
+    private View emptyView;
+    private TextView taskCountText;
     private List<Task> taskList;
 
     @Override
@@ -32,11 +33,15 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("");
+        }
 
         databaseHelper = new DatabaseHelper(this);
 
         recyclerView = findViewById(R.id.recyclerView);
         emptyView = findViewById(R.id.emptyView);
+        taskCountText = findViewById(R.id.taskCountText);
         FloatingActionButton fab = findViewById(R.id.fab);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
                 startActivity(intent);
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             }
         });
     }
@@ -78,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         taskList.addAll(databaseHelper.getAllTasks());
         taskAdapter.notifyDataSetChanged();
 
+        updateTaskCount();
+
         if (taskList.isEmpty()) {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
@@ -87,19 +95,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateTaskCount() {
+        int totalTasks = taskList.size();
+        int completedTasks = 0;
+
+        for (Task task : taskList) {
+            if (task.isCompleted()) {
+                completedTasks++;
+            }
+        }
+
+        if (totalTasks == 0) {
+            taskCountText.setText("У вас нет активных задач");
+        } else {
+            taskCountText.setText("Задач: " + totalTasks + " | Выполнено: " + completedTasks);
+        }
+    }
+
     private void deleteTask(Task task) {
         databaseHelper.deleteTask(task.getId());
         loadTasks();
-        Toast.makeText(this, "Задача удалена", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "✓ Задача удалена", Toast.LENGTH_SHORT).show();
     }
 
     private void updateTaskStatus(Task task) {
         task.setCompleted(!task.isCompleted());
         databaseHelper.updateTask(task);
         taskAdapter.notifyDataSetChanged();
-        Toast.makeText(this,
-                task.isCompleted() ? "Задача выполнена" : "Задача не выполнена",
-                Toast.LENGTH_SHORT).show();
+        updateTaskCount();
+
+        if (task.isCompleted()) {
+            Toast.makeText(this, "✓ Задача выполнена!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "○ Задача не выполнена", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -113,9 +142,13 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_delete_all) {
-            databaseHelper.deleteAllTasks();
-            loadTasks();
-            Toast.makeText(this, "Все задачи удалены", Toast.LENGTH_SHORT).show();
+            if (taskList.isEmpty()) {
+                Toast.makeText(this, "Нет задач для удаления", Toast.LENGTH_SHORT).show();
+            } else {
+                databaseHelper.deleteAllTasks();
+                loadTasks();
+                Toast.makeText(this, "✓ Все задачи удалены", Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
 
